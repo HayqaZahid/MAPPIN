@@ -1,0 +1,92 @@
+.loginContainer {
+  width: 340px;
+  padding: 25px;
+  border-radius: 15px;
+  background: #ffffff;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+  position: absolute;
+  top: 0; bottom: 0; left: 0; right: 0;
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  animation: popupFade 0.3s ease-in-out;
+}
+
+@keyframes popupFade {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.loginCancel {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  cursor: pointer;
+  color: #888;
+  transition: 0.2s;
+}
+.loginCancel:hover {
+  color: #ff4d4d;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  color: teal;
+  font-weight: 700;
+  font-size: 20px;
+  margin-bottom: 15px;
+}
+
+.logoIcon {
+  margin-right: 6px;
+}
+
+.form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.inputGroup {
+  display: flex;
+  align-items: center;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 8px 10px;
+  background: #fafafa;
+}
+.inputGroup input {
+  border: none;
+  outline: none;
+  flex: 1;
+  padding: 6px;
+  font-size: 14px;
+  background: transparent;
+}
+.inputIcon {
+  color: #888;
+  margin-right: 8px;
+}
+
+.loginBtn {
+  border: none;
+  padding: 10px;
+  background-color: teal;
+  border-radius: 8px;
+  color: white;
+  cursor: pointer;
+  font-weight: bold;
+  transition: 0.3s;
+}
+.loginBtn:hover {
+  background-color: #008b8b;
+}
+
+.failure {
+  font-size: 13px;
+  color: red;
+  text-align: center;
+}
