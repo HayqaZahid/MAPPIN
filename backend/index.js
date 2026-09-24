@@ -8,15 +8,31 @@ const cors = require("cors");
 dotenv.config();
 
 app.use(express.json());
-app.use(cors()); 
-mongoose 
- .connect(process.env.MONGO_URL)   
- .then(() => console.log("MongoDB connected!"))
- .catch(err => console.log(err));
+app.use(cors());
+
+// Cache the DB connection across serverless invocations
+let isConnected = false;
+app.use(async (req, res, next) => {
+  if (isConnected) return next();
+  try {
+    await mongoose.connect(process.env.MONGO_URL);
+    isConnected = true;
+    console.log("MongoDB connected!");
+    next();
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Database connection failed" });
+  }
+});
 
 app.use("/api/users", userRoute);
 app.use("/api/pins", pinRoute);
 
-app.listen(8800, () => {
-  console.log("Backend server is running!");
-});
+// Only listen locally — on Vercel this file is imported, not run directly
+if (require.main === module) {
+  app.listen(8800, () => {
+    console.log("Backend server is running!");
+  });
+}
+
+module.exports = app;
