@@ -1,26 +1,25 @@
-.registerContainer {
+ .registerContainer {
   width: 300px;
   padding: 20px;
   border-radius: 10px;
   background-color: white;
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  margin: auto;
-  height: 260px;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1000;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  gap: 10px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
 }
 
 .registerCancel {
   position: absolute;
-  top: 3px;
-  right: 3px;
+  top: 8px;
+  right: 8px;
   cursor: pointer;
 }
 
@@ -34,7 +33,7 @@
 
 .registerBtn {
   border: none;
-  padding: 5px;
+  padding: 8px;
   background-color: teal;
   color: white;
   cursor: pointer;
