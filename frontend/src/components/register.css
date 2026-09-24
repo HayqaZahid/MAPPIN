@@ -1,7 +1,7 @@
- .registerContainer {
-  width: 300px;
-  padding: 20px;
-  border-radius: 10px;
+.registerContainer {
+  width: 320px;
+  padding: 28px 24px;
+  border-radius: 14px;
   background-color: white;
   position: fixed;
   top: 50%;
@@ -11,42 +11,77 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  gap: 14px;
+  box-shadow: 0 0 0 2000px rgba(0, 0, 0, 0.55), 0 8px 30px rgba(0, 0, 0, 0.3);
 }
 
-.registerCancel {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  cursor: pointer;
-}
-
-.logo {
+.registerContainer .logo {
   display: flex;
   align-items: center;
-  justify-content: center;
+  gap: 6px;
   color: teal;
   font-weight: 700;
+  font-size: 20px;
+  margin-bottom: 4px;
+}
+
+.registerContainer form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.registerContainer input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+
+.registerContainer input:focus {
+  border-color: teal;
 }
 
 .registerBtn {
   border: none;
-  padding: 8px;
+  padding: 10px;
+  border-radius: 8px;
   background-color: teal;
   color: white;
+  font-weight: 600;
   cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.registerBtn:hover {
+  background-color: #036666;
+}
+
+.registerCancel {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  cursor: pointer;
+  color: #888;
+}
+
+.registerCancel:hover {
+  color: #333;
 }
 
 .success {
-  font-size: 12px;
+  font-size: 13px;
   color: green;
   text-align: center;
 }
 
 .failure {
-  font-size: 12px;
-  color: red;
+  font-size: 13px;
+  color: #e53935;
   text-align: center;
 }
