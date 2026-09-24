@@ -45,22 +45,22 @@ function App() {
     }
   }, []);
 
-  const mapStyles = {
+ const mapStyles = {
     default: {
       url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
       attribution: "&copy; OpenStreetMap contributors",
     },
     dark: {
-      url: "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
-      attribution: "&copy; OpenStreetMap &copy; CartoDB",
+      url: "https://{s}.tile-cyclosm.openstreetmap.fr/cyclosm/{z}/{x}/{y}.png",
+      attribution: "&copy; OpenStreetMap contributors, CyclOSM",
     },
     light: {
-      url: "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
-      attribution: "&copy; OpenStreetMap &copy; CartoDB",
+      url: "https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png",
+      attribution: "&copy; OpenStreetMap contributors, Humanitarian",
     },
     voyager: {
-      url: "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
-      attribution: "&copy; OpenStreetMap &copy; CartoDB",
+      url: "https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png",
+      attribution: "&copy; OpenStreetMap contributors, OpenTopoMap",
     },
   };
 
