@@ -8,9 +8,12 @@ import {
 } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
+import axios from "axios";
 import "./app.css";
 import { format } from "timeago.js";
- 
+import Login from "./components/Login";
+import Register from "./components/Register";
+
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl:
@@ -21,31 +24,23 @@ L.Icon.Default.mergeOptions({
     "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
 });
 
+const myStorage = window.localStorage;
+
 function App() {
   const [mapStyle, setMapStyle] = useState("light");
+  const [pins, setPins] = useState([]);
   const [newPlace, setNewPlace] = useState(null);
   const [title, setTitle] = useState("");
   const [desc, setDesc] = useState("");
   const [rating, setRating] = useState(1);
-  const [username, setUsername] = useState("Hayqa");
 
-  const [currentUser, setCurrentUser] = useState(null);
+  const [currentUsername, setCurrentUsername] = useState(
+    myStorage.getItem("user")
+  );
   const [showRegister, setShowRegister] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
- 
-  const [registerUsername, setRegisterUsername] = useState("");
-  const [registerPassword, setRegisterPassword] = useState("");
-  const [loginUsername, setLoginUsername] = useState("");
-  const [loginPassword, setLoginPassword] = useState("");
- 
-  useEffect(() => {
-    const savedUser = localStorage.getItem("currentUser");
-    if (savedUser) {
-      setCurrentUser(savedUser);
-    }
-  }, []);
 
- const mapStyles = {
+  const mapStyles = {
     default: {
       url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
       attribution: "&copy; OpenStreetMap contributors",
@@ -64,60 +59,34 @@ function App() {
     },
   };
 
-  const locations = [
-    {
-      name: "Islamabad",
-      position: [33.6844, 73.0479],
-      description: "Capital city of Pakistan",
-      population: "1.18 million",
-      established: "1960",
-      createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000),
-    },
-    {
-      name: "Karachi",
-      position: [24.8607, 67.0011],
-      description: "Largest city and economic hub",
-      population: "14.9 million",
-      established: "1729",
-      createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
-    },
-    {
-      name: "Lahore",
-      position: [31.5204, 74.3587],
-      description: "Cultural capital of Pakistan",
-      population: "11.1 million",
-      established: "1000 AD",
-      createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000),
-    },
-    {
-      name: "Rawalpindi",
-      position: [33.5651, 73.0169],
-      description: "Twin city of Islamabad",
-      population: "2.1 million",
-      established: "1493",
-      createdAt: new Date(Date.now() - 30 * 60 * 1000),
-    },
-    {
-      name: "Wah Cantt",
-      position: [33.2311, 53.0124],
-      description: "city with highest literacy rate",
-      population: "0.1 million",
-      established: "1200",
-      createdAt: new Date(Date.now() - 30 * 60 * 1000),
-    },
-  ];
+  // Load real pins from the backend on first load
+  useEffect(() => {
+    const fetchPins = async () => {
+      try {
+        const res = await axios.get("/pins");
+        setPins(res.data);
+      } catch (err) {
+        console.error("Error fetching pins:", err);
+      }
+    };
+    fetchPins();
+  }, []);
 
   const handleAddClick = (e) => {
+    if (!currentUsername) {
+      alert("Please login first to add a pin!");
+      return;
+    }
     setNewPlace({
       lat: e.latlng.lat,
       long: e.latlng.lng,
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const newPin = {
-      username: username,
+      username: currentUsername,
       title,
       desc,
       rating,
@@ -125,60 +94,22 @@ function App() {
       long: newPlace.long,
     };
 
-    console.log("Pin added:", newPin);
-
-    setNewPlace(null);
-    setTitle("");
-    setDesc("");
-    setRating(1);
+    try {
+      const res = await axios.post("/pins", newPin);
+      setPins([...pins, res.data]);
+      setNewPlace(null);
+      setTitle("");
+      setDesc("");
+      setRating(1);
+    } catch (err) {
+      console.error("Error saving pin:", err);
+      alert("Failed to save pin. Please try again.");
+    }
   };
 
   const handleLogout = () => {
-    setCurrentUser(null);
-    localStorage.removeItem("currentUser");
-    console.log("Logged out!");
-  };
-
-  const handleRegisterSubmit = (e) => {
-    e.preventDefault();
-    const newUser = {
-      username: registerUsername,
-      password: registerPassword,
-    };
- 
-    let users = JSON.parse(localStorage.getItem("users")) || [];
-    const exists = users.find((u) => u.username === newUser.username);
-    if (exists) {
-      alert("Username already exists!");
-      return;
-    }
-    users.push(newUser);
-    localStorage.setItem("users", JSON.stringify(users));
-
-    setShowRegister(false);
-    alert("User registered successfully!");
-  };
-
-  const handleLoginSubmit = (e) => {
-    e.preventDefault();
-    const user = {
-      username: loginUsername,
-      password: loginPassword,
-    };
-
-    let users = JSON.parse(localStorage.getItem("users")) || [];
-    const found = users.find(
-      (u) => u.username === user.username && u.password === user.password
-    );
-
-    if (found) {
-      setCurrentUser(found.username);
-      localStorage.setItem("currentUser", found.username);
-      setShowLogin(false);
-      alert("Logged in successfully!");
-    } else {
-      alert("Invalid credentials!");
-    }
+    setCurrentUsername(null);
+    myStorage.removeItem("user");
   };
 
   const MapEvents = () => {
@@ -194,7 +125,7 @@ function App() {
       style={{ textAlign: "center", fontFamily: "Arial, sans-serif" }}
     >
       <h1 style={{ margin: "10px 0" }}> Map App</h1>
- 
+
       <div style={{ margin: "10px 0" }}>
         <button onClick={() => setMapStyle("default")}>Default</button>
         <button onClick={() => setMapStyle("dark")}>Dark</button>
@@ -217,9 +148,9 @@ function App() {
           url={mapStyles[mapStyle].url}
           attribution={mapStyles[mapStyle].attribution}
         />
- 
-        {locations.map((location, index) => (
-          <Marker key={index} position={location.position}>
+
+        {pins.map((pin) => (
+          <Marker key={pin._id} position={[pin.lat, pin.long]}>
             <Popup closeButton={true} autoClose={true} closeOnClick={false}>
               <div
                 style={{
@@ -229,24 +160,11 @@ function App() {
                   color: "#222",
                 }}
               >
-                <h3
-                  style={{
-                    margin: "0 0 8px 0",
-                    fontSize: "16px",
-                    fontWeight: "bold",
-                    color: "#000",
-                  }}
-                >
-                  {location.name}
+                <h3 style={{ margin: "0 0 8px 0", fontSize: "16px" }}>
+                  {pin.title}
                 </h3>
                 <p style={{ margin: "4px 0", fontSize: "14px" }}>
-                  {location.description}
-                </p>
-                <p style={{ margin: "4px 0", fontSize: "13px" }}>
-                  <strong>Population:</strong> {location.population}
-                </p>
-                <p style={{ margin: "4px 0", fontSize: "13px" }}>
-                  <strong>Established:</strong> {location.established}
+                  {pin.desc}
                 </p>
                 <p
                   style={{
@@ -255,35 +173,15 @@ function App() {
                     color: "#ff9800",
                   }}
                 >
-                  ⭐⭐⭐⭐⭐
+                  {"⭐".repeat(pin.rating)}
                 </p>
                 <hr style={{ margin: "8px 0" }} />
                 <p
-                  style={{ margin: "3px 0", fontSize: "12px", color: "#666" }}
-                >
-                  📍 Coordinates: {location.position[0].toFixed(4)},{" "}
-                  {location.position[1].toFixed(4)}
-                </p>
-                <p
                   style={{ margin: "3px 0", fontSize: "12px", color: "#999" }}
                 >
-                  created by <strong>Hayqa</strong> {format(location.createdAt)}
+                  created by <strong>{pin.username}</strong>{" "}
+                  {format(pin.createdAt)}
                 </p>
-                <button
-                  style={{
-                    marginTop: "6px",
-                    padding: "6px 12px",
-                    backgroundColor: "#007bff",
-                    color: "white",
-                    border: "none",
-                    borderRadius: "5px",
-                    cursor: "pointer",
-                    fontSize: "13px",
-                  }}
-                  onClick={() => alert(`More info about ${location.name}!`)}
-                >
-                  Learn More
-                </button>
               </div>
             </Popup>
           </Marker>
@@ -331,11 +229,11 @@ function App() {
           </Marker>
         )}
       </MapContainer>
- 
+
       <div className="buttons-container">
-        {currentUser ? (
+        {currentUsername ? (
           <button className="button logout" onClick={handleLogout}>
-            Log out ({currentUser})
+            Log out ({currentUsername})
           </button>
         ) : (
           <div className="auth-buttons">
@@ -351,60 +249,14 @@ function App() {
           </div>
         )}
       </div>
- 
-      {showRegister && (
-        <div className="register-popup">
-          <form className="register-form" onSubmit={handleRegisterSubmit}>
-            <label>Username</label>
-            <input
-              type="text"
-              placeholder="username"
-              onChange={(e) => setRegisterUsername(e.target.value)}
-            />
-            <label>Password</label>
-            <input
-              type="password"
-              placeholder="password"
-              onChange={(e) => setRegisterPassword(e.target.value)}
-            />
-            <button type="submit">Register</button>
-           
-            <button
-              type="button"
-              onClick={() => setShowRegister(false)}
-              className="close-popup"
-            >
-              X
-            </button>
-          </form>
-        </div>
-      )}
 
+      {showRegister && <Register setShowRegister={setShowRegister} />}
       {showLogin && (
-        <div className="login-popup">
-          <form className="login-form" onSubmit={handleLoginSubmit}>
-            <label>Username</label>
-            <input
-              type="text"
-              placeholder="username"
-              onChange={(e) => setLoginUsername(e.target.value)}
-            />
-            <label>Password</label>
-            <input
-              type="password"
-              placeholder="password"
-              onChange={(e) => setLoginPassword(e.target.value)}
-            />
-            <button type="submit">Login</button> 
-            <button
-              type="button"
-              onClick={() => setShowLogin(false)}
-              className="close-popup"
-            >
-              X
-            </button>
-          </form>
-        </div>
+        <Login
+          setShowLogin={setShowLogin}
+          setCurrentUsername={setCurrentUsername}
+          myStorage={myStorage}
+        />
       )}
     </div>
   );
